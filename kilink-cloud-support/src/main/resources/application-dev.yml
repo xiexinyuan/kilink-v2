@@ -1,0 +1,134 @@
+server:
+  port: 8887
+
+# 日志配置
+logging:
+  # 日志文件存放地址
+  path: ./logs
+
+spring:
+  application:
+    # 必填 logback配置文件引用了该属性作为应用名称
+    name: klink-cloud-support
+  #==========================================jackson时间格式化=================================
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  #==========================================数据源配置=================================
+  datasource:
+    ksoa-kilink:
+      url: jdbc:mysql://172.20.4.235:3306/ksoa-kilink?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+      username: root
+      password: test
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      # Hikari 连接池
+      type: com.zaxxer.hikari.HikariDataSource
+      hikari:
+        minimum-idle: 5
+        maximum-pool-size: 15
+        auto-commit: true
+        idle-timeout: 30000
+        pool-name: Hikari-ksoa-kilink
+        max-lifetime: 1800000
+        connection-timeout: 30000
+        connection-test-query: SELECT 1
+    kilink:
+      url: jdbc:mysql://172.20.4.235:3306/KiLink?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+      username: root
+      password: test
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      # Hikari 连接池
+      type: com.zaxxer.hikari.HikariDataSource
+      hikari:
+        minimum-idle: 5
+        maximum-pool-size: 15
+        auto-commit: true
+        idle-timeout: 30000
+        pool-name: Hikari-ksoa-kilink
+        max-lifetime: 1800000
+        connection-timeout: 30000
+        connection-test-query: SELECT 1
+  #==========================================redis配置========================================
+  redis:
+    # 集群配置
+    cluster:
+      # 获取失败 最大重定向次数
+      max-redirects: 3
+      # 集群地址 多个地址时用,分隔
+      nodes: 172.20.4.231:22121
+    timeout: 3000ms
+    # 连接池配置
+    lettuce:
+      pool:
+        #连接池最大连接数（使用负值表示没有限制）
+        max-active: 300
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: 1000
+        # 连接池中的最大空闲连接
+        max-idle: 100
+        # 连接池中的最小空闲连接
+        min-idle: 50
+    database: 0
+
+  #==========================================集成dubbo配置======================================
+dubbo:
+  # 应用配置,用于配置当前应用应用信息,不管提供者还是消费者
+  application:
+    # name：必填(服务治理) ** 当前应用名称,用于注册中心计算应用间依赖关系,消费者和提供者应用名最好不要一样,此项不是匹配条件
+    name: klink-cloud-support
+    # owner：可选(服务治理) ** 应用负责人 ,填写负责人公司邮箱前缀
+    owner: xiexinyuan
+    # version：可选 (服务治理) ** 当前版本
+    version: 1.0
+    # environment ：可选(服务治理) ** 应应用环境，如：develop/test/product，不同环境使用不同的缺省值，以及作为只用于开发测试功能的限制条件
+    environment: develop
+    # organization：可选(服务治理) ** 组织名称,BU或者部门
+    organization: konka
+    # 是否启动QoS
+    qos-enable: true
+    # 启动QoS绑定的端口
+    qos-port: 22222
+    # 是否允许远程访问 (注意，从2.6.4/2.7.0开始，qosAcceptForeignIp默认配置改为false（拒绝远端主机发出的命令，只允许服务本机执行），如果qosAcceptForeignIp设置为true，有可能带来安全风险，请仔细评估后再打开)
+    qos-accept-foreign-ip: false
+
+  # 不同集群的注册中心，请配置多个dubbo:registry
+  registry:
+    # 使用zookeeper注册中心暴露服务地址
+    protocol: zookeeper
+    # address：必填(服务发现) ** 注册中心服务器地址，如果地址没有端口缺省为9090，同一集群内的多个地址用逗号分隔，如：ip:port,ip:port
+    address: zookeeper://172.20.3.151:2181
+  protocol:
+    # 用dubbo协议在20880端口暴露服务
+    name: dubbo
+    port: 20881
+  #monitor:
+    # 监控中心配置 protocol：可选 (服务治理) ** 监控中心协议，如果为protocol="registry"，表示从注册中心发现监控中心地址，否则直连监控中心
+    #protocol: registry
+
+#==========================================http配置服务==================================
+http:
+  #最大连接数
+  maxTotal: 100
+  #并发数
+  defaultMaxPerRoute: 20
+  #创建连接的最长时间
+  connectTimeout: 1000
+  #从连接池中获取到连接的最长时间
+  connectionRequestTimeout: 500
+  #数据传输的最长时间
+  socketTimeout: 10000
+  #提交请求前测试连接是否可用10000
+  staleConnectionCheckEnabled: true
+
+kilink:
+  # 云端域名
+  cloud_url: http://kilink-api.konka.com
+  # redis中保存kilink访问的token的key
+  admin_accesstoken_rediskey: kilink_support_admin_token
+  # 授权id
+  kilink_access_key_id: 320192b55100ba00
+  # 授权秘钥
+  kilink_access_key_secret: 3dbe055b41fbb3c98295dade034f02ca
+  # 产品数据端点缓存key
+  kilink_product_datapoint: 'kilink_product_datapoint:'
+

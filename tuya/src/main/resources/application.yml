@@ -1,0 +1,46 @@
+server:
+  port: 8888
+  servlet:
+    context-path: /tuyaGateway/
+
+spring:
+  profiles:
+    # 环境 dev|test|pro
+    active: test
+  application:
+    name: tuya
+    #==========================================jackson时间格式化==============================
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+    default-property-inclusion: non_null
+
+    #==========================================http配置==================================
+http:
+  #最大连接数
+  maxTotal: 100
+  #并发数
+  defaultMaxPerRoute: 20
+  #创建连接的最长时间
+  connectTimeout: 1000
+  #从连接池中获取到连接的最长时间
+  connectionRequestTimeout: 500
+  #数据传输的最长时间
+  socketTimeout: 10000
+  #提交请求前测试连接是否可用10000
+  staleConnectionCheckEnabled: true
+
+  #==========================================网关信息配置==================================
+gateway:
+  # 对应kilink平台智能网关品类下的产品ID
+  productId: 1607d2bb159500011607d2bb1595de01
+  # 虚拟网关设备名
+  deviceName: tuya_gateway_device
+  # 虚拟网关设备id redis
+  gateway_device_id: tuya_gateway_device_id
+  # 产品映射关系前缀 redis
+  product_mapping_prefix: 'tuya_product_mapping:'
+  # 设备映射关系前缀 redis
+  device_mapping_prefix: 'tuya_device_mapping:'
+  # 数据端点映射关系前缀 redis
+  datapoint_mapping_prefix: 'tuya_datapoint_mapping:'

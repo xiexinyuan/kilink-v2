@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+   <!-- 自定义参数 -->
+	<!--日志存放目录-->
+	<springProperty scope="context" name="log.dir" source="logging.path"/>
+	<!--当前应用名称-->
+	<springProperty scope="context" name="app.name" source="spring.application.name"/>
+	<!--格式化日志输出格式-->
+	<property name="encoder.pattern" value="[%-5level] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%logger{1}] - %msg%n" />
+	<!--格式化日志输出编码-->
+	<property name="encoder.charset" value="UTF-8" />
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<!--恢复控制台日志颜色-->
+			<pattern>%highlight(%date{yyyy-MM-dd HH:mm:ss.SSS}) %yellow([%thread]) %highlight([%-5level])  %cyan([%replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''}]) %msg%n</pattern>
+			<charset class="java.nio.charset.Charset">${encoder.charset}</charset>
+			<immediateFlush>true</immediateFlush>
+		</encoder>
+	</appender>
+
+	<appender name="INFO_FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${log.dir}/${app.name}/info.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log.dir}/${app.name}/info-%d{yyyyMMdd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>10</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${encoder.pattern}</pattern>
+			<charset class="java.nio.charset.Charset">${encoder.charset}</charset>
+			<immediateFlush>true</immediateFlush>
+		</encoder>
+	</appender>
+
+	<appender name="ERROR_FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+		<File>${log.dir}/${app.name}/error.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log.dir}/${app.name}/error-%d{yyyyMMdd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>10</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${encoder.pattern}</pattern>
+			<charset class="java.nio.charset.Charset">${encoder.charset}</charset>
+			<immediateFlush>true</immediateFlush>
+		</encoder>
+	</appender>
+	
+	<root level="INFO">
+	    <appender-ref ref="STDOUT" />
+		<appender-ref ref="INFO_FILE" />
+		<appender-ref ref="ERROR_FILE" />
+	</root>
+
+	<logger name="org.springframework.web" level="INFO" />
+
+</configuration>

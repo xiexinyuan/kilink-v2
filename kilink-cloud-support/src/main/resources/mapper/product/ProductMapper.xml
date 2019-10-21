@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.konka.iot.kilink.cloud.support.core.dao.product.ProductDao">
+
+
+    <resultMap id="productMappingMap" type="com.konka.iot.kilink.cloud.support.api.model.product.ProductMapping">
+        <id column="id" property="id" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+        <result column="k_product_id" property="kProductId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result column="t_product_id" property="tProductId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+
+    <select id="getProductMapping" resultType="String">
+        <if test="k_pid == null and t_pid != null">
+            select k_product_id from yy_product_mapping where t_product_id = #{t_pid} limit 1
+        </if>
+
+        <if test="t_pid == null and k_pid != null">
+            select t_product_id from yy_product_mapping where k_product_id = #{k_pid} limit 1
+        </if>
+    </select>
+
+
+    <select id="getKilinkProductIdBatch" parameterType="java.util.Set" resultMap="productMappingMap">
+        select id, k_product_id, t_product_id from yy_product_mapping
+        where t_product_id in
+        <foreach collection="pids" item="pid" open="(" separator="," close=")">
+            #{pid}
+        </foreach>
+    </select>
+</mapper>

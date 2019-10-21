@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.konka.iot.kilink.cloud.support.core.dao.device.DeviceDao">
+
+
+    <resultMap id="deviceMappingMap" type="com.konka.iot.kilink.cloud.support.api.model.device.DeviceMapping">
+        <id column="id" property="id" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+        <result column="k_device_id" property="kDeviceId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result column="t_device_id" property="tDeviceId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+    </resultMap>
+
+    <resultMap id="datapointMappingMap" type="com.konka.iot.kilink.cloud.support.api.model.device.DataponitMapping">
+        <id column="id" property="id" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+        <result column="t_product_id" property="tProductId" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result column="t_datapoint_code" property="tDatapointCode" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result column="k_datapoint_index" property="kDatapointIndex" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+        <result column="k_datapoint_code" property="kDatapointCode" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result column="k_datapoint_type" property="kDatapointType" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+    </resultMap>
+
+    <select id="findTuyaDeviceId" resultType="String">
+        select t_device_id from yy_device_mapping where k_device_id = #{kDeviceId}
+    </select>
+
+
+    <select id="findDeviceMapping" resultMap="deviceMappingMap">
+        select id, k_device_id, t_device_id from yy_device_mapping where t_device_id in
+        <foreach collection="tDeviceIds" item="tDeviceId" open="(" separator="," close=")">
+            #{tDeviceId}
+        </foreach>
+    </select>
+
+
+    <insert id="addDeviceMapping">
+        insert into yy_device_mapping(k_device_id, t_device_id) values (#{kDeviceId}, #{tDeviceId})
+    </insert>
+
+    <select id="findThridDatapointMapping" resultMap="datapointMappingMap">
+        select
+            id,
+            t_product_id,
+            t_datapoint_code,
+            k_datapoint_index,
+            k_datapoint_code,
+            k_datapoint_type
+        from yy_datapoint_mapping
+        where t_product_id = #{tpid}
+    </select>
+
+</mapper>

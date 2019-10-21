@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    # 环境 dev|test|pro
+    active: dev
+
+#缓存key配置
+redis-prefix:
+  tuya:
+    # 产品映射关系前缀 redis
+    product_mapping_prefix: 'tuya_product_mapping:'
+    # 设备映射关系前缀 redis
+    device_mapping_prefix: 'tuya_device_mapping:'
+    # 数据端点映射关系前缀 redis
+    datapoint_mapping_prefix: 'tuya_datapoint_mapping:'

@@ -1,0 +1,96 @@
+# 日志配置
+logging:
+    # 日志文件存放地址
+    path: ./logs
+spring:
+    #==========================================redis配置=====================================
+    redis:
+        # 集群配置
+        cluster:
+            # 获取失败时最大重定向次数
+            max-redirects: 3
+            # 集群地址 多个地址时用,分隔
+            nodes: 172.20.4.231:22121
+        timeout: 3000ms
+        # 连接池配置
+        lettuce:
+            pool:
+                #连接池最大连接数（使用负值表示没有限制）
+                max-active: 300
+                # 连接池最大阻塞等待时间（使用负值表示没有限制）
+                max-wait: 1000
+                # 连接池中的最大空闲连接
+                max-idle: 100
+                # 连接池中的最小空闲连接
+                min-idle: 50
+        database: 0
+    #==========================================集成dubbo配置==================================
+dubbo:
+    # 应用配置,用于配置当前应用应用信息,不管提供者还是消费者
+    application:
+        # name：必填(服务治理) ** 当前应用名称,用于注册中心计算应用间依赖关系,消费者和提供者应用名最好不要一样,此项不是匹配条件
+        name: tuya
+        # owner：可选(服务治理) ** 应用负责人 ,填写负责人公司邮箱前缀
+        owner: xiexinyuan
+        # version：可选 (服务治理) ** 当前版本
+        version: 1.0
+        # environment ：可选(服务治理) ** 应应用环境，如：develop/test/product，不同环境使用不同的缺省值，以及作为只用于开发测试功能的限制条件
+        environment: develop
+        # organization：可选(服务治理) ** 组织名称,BU或者部门
+        organization: konka
+        #
+        # 是否启动QoS
+        qos-enable: true
+        # 启动QoS绑定的端口
+        qos-port: 33333
+        # 是否允许远程访问 (注意，从2.6.4/2.7.0开始，qosAcceptForeignIp默认配置改为false（拒绝远端主机发出的命令，只允许服务本机执行），如果qosAcceptForeignIp设置为true，有可能带来安全风险，请仔细评估后再打开)
+        qos-accept-foreign-ip: false
+    # 不同集群的注册中心，请配置多个dubbo:registry
+    registry:
+        # 使用zookeeper注册中心暴露服务地址
+        protocol: zookeeper
+        # address：必填(服务发现) ** 注册中心服务器地址，如果地址没有端口缺省为9090，同一集群内的多个地址用逗号分隔，如：ip:port,ip:port
+        address: zookeeper://172.20.3.151:2181
+    consumer:
+        timeout: 2000
+    #monitor:
+        # 监控中心配置 protocol：可选 (服务治理) ** 监控中心协议，如果为protocol="registry"，表示从注册中心发现监控中心地址，否则直连监控中心
+        #protocol: registry
+    #==========================================涂鸦参数配置==================================
+tuya:
+    # 开发者平台申请的 accessId & accessKey(等同于client_id & secret)
+    accessId: awdhrqavkxm9n8r3yvh9
+    accessKey: asek3rackvydehmjgvd9nhepu3cf9rhh
+    schema: konkakilink
+    # 地区代码 中国区 cn, 美洲区 us, 欧洲区 eu
+    country: cn
+    # 地区编码
+    countryCode: 86
+    # api环境说明 中国区 cn, 美洲区 us, 欧洲区 eu
+    cn_url: https://openapi.tuyacn.com
+    us_url: https://openapi.tuyaus.com
+    eu_url: https://openapi.tuyaeu.com
+
+    #==========================================mqtt配置==================================
+mqtt:
+    # 连接地址
+    url: tcp://kilink-cm.konka.com
+    # 用户名
+    userName: 5d89d10f5c9046b608d6faf2
+    # 密码
+    passWord: 7d6fcf49-345b-4c81-aa4c-8c7711e0c6e3
+    # 客户端ID
+    clientId: X:DEVICE;A:3;V:1;RES:TUYA_GATEWAY;
+    # 服务质量
+    qos: 1
+    # 设置会话心跳时间 单位为秒 服务器会每隔几秒的时间向客户端发送个消息判断客户端是否在线
+    keepAliveInterval: 30
+    # 连接超时时间
+    connectionTimeout: 15
+    # mqtt 版本
+    version: 4
+    # 自动重连
+    automaticReconnect: false
+    # 设置是否清空session,false表示服务器会保留客户端的连接记录，true表示每次连接到服务器都以新的身份连接
+    cleanSession: true
+
