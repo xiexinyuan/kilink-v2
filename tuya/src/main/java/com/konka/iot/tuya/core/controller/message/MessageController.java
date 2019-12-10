@@ -52,7 +52,7 @@ public class MessageController {
 
         ResponseModel<Boolean> resp = new ResponseModel<>(true);
         try {
-            Integer clientId = Integer.parseInt(request.getHeader("client-id"));
+            String clientId = request.getHeader("client-id");
             String accessToken = request.getHeader("access-token");
             String signature = request.getHeader("signature");
             String t = request.getHeader("t");

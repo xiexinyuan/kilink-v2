@@ -81,7 +81,7 @@ dubbo:
     # version：可选 (服务治理) ** 当前版本
     version: 1.0
     # environment ：可选(服务治理) ** 应应用环境，如：develop/test/product，不同环境使用不同的缺省值，以及作为只用于开发测试功能的限制条件
-    environment: develop
+    environment: test
     # organization：可选(服务治理) ** 组织名称,BU或者部门
     organization: konka
     # 是否启动QoS

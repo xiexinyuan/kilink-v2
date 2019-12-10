@@ -5,13 +5,13 @@ import com.konka.iot.baseframe.common.utils.SpringContextUtil;
 import com.konka.iot.tuya.core.service.gateway.GatewayService;
 import com.konka.iot.tuya.listener.ApplicationServiceCloseListener;
 import com.konka.iot.tuya.mqtt.DeviceMqttClientService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -19,9 +19,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 @EnableDubbo
 @EnableCaching
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-public class TuyaApplication implements CommandLineRunner {
+public class TuyaApplication extends SpringBootServletInitializer  implements CommandLineRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(TuyaApplication.class);
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(TuyaApplication.class);
+    }
 
     public static void main(String[] args) {
         ApplicationContext applicationContext = SpringApplication.run(TuyaApplication.class, args);

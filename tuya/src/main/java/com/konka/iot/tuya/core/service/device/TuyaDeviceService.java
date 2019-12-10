@@ -1,6 +1,8 @@
 package com.konka.iot.tuya.core.service.device;
 
 import com.konka.iot.tuya.model.device.DeviceTokenReqModel;
+import com.konka.iot.tuya.model.device.StatisticAccumulate;
+import com.konka.iot.tuya.model.device.StatisticType;
 import com.tuya.api.model.Command;
 import com.tuya.api.model.domain.device.*;
 
@@ -61,7 +63,7 @@ public interface TuyaDeviceService {
      * @return List<DeviceVo>
      * @throws Exception
      */
-    List<DeviceVo> listSub(String deviceId, long discoveryTime) throws Exception;
+    List<DeviceVo> listSub(String deviceId, Long discoveryTime) throws Exception;
 
     /** 获取设备详情
      * @author xiexinyuan
@@ -166,4 +168,21 @@ public interface TuyaDeviceService {
      * @throws Exception
      */
     List<Status> getDeviceStatus(String deviceId) throws Exception;
+
+    /**
+     * 获取设备支持的统计类型
+     * @param deviceId
+     * @return
+     * @throws Exception
+     */
+    List<StatisticType> getAllStatisticType(String deviceId) throws Exception;
+
+    /**
+     * 获取历史累计值
+     * @param deviceId
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    StatisticAccumulate getStatisticAccumulate(String deviceId, String code) throws  Exception;
 }

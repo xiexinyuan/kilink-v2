@@ -139,7 +139,32 @@ public class XlinkMqttMsgUtil {
         }
     }
 
-    public static byte[] getStatusRebackResponse(){
-        return new byte[]{0, 8, 0, 3, 0, 0, 0};
+    public static byte[] getStatusRebackResponse(int messageId){
+        byte[] payload = new byte[8];
+        int index = 0;
+        // type
+        payload[index++] = 0x00;
+        payload[index++] = 0x08;
+
+        index += 2;
+
+        // message id
+        int message_h = (messageId & 0xFF00) >> 8;
+        int message_l = messageId & 0xFF;
+        payload[index++] = (byte)message_h;
+        payload[index++] = (byte)message_l;
+
+        // ret code
+        payload[index++] = 0x00;
+
+        // data length
+        int data_length = index - 4;
+        int length_h = (data_length & 0xFF00) >> 8;
+        int length_l = data_length & 0xFF;
+
+        payload[2] = (byte)length_h;
+        payload[3] = (byte)length_l;
+
+        return payload;
     }
 }

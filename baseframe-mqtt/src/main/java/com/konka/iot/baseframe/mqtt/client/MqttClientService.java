@@ -7,6 +7,8 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 
 /**
  * @author xiexinyuan
@@ -143,6 +145,28 @@ public abstract class MqttClientService {
                 }
             }
 
+        } else {
+            log.error("mqtt client is null");
+            throw new DataCheckException("mqtt client is null");
+        }
+
+    }
+
+    // 发布消息
+    public void publishMessage(String pubTopic, MqttMessage mqttMessage) throws Exception {
+        if (null != client && client.isConnected()) {
+            MqttTopic topic = client.getTopic(pubTopic);
+            if (null != topic) {
+                try {
+                    MqttDeliveryToken publish = topic.publish(mqttMessage);
+                    if (!publish.isComplete()) {
+                        log.info("消息发布成功");
+                    }
+                } catch (MqttException e) {
+                    log.error("消息发布异常： {}", e.getMessage());
+                    e.printStackTrace();
+                }
+            }
         } else {
             log.error("mqtt client is null");
             throw new DataCheckException("mqtt client is null");

@@ -1,9 +1,6 @@
 package com.konka.iot.kilink.cloud.support.api.service.device;
 
-import com.konka.iot.kilink.cloud.support.api.model.device.DataponitMapping;
-import com.konka.iot.kilink.cloud.support.api.model.device.DeviceMapping;
-import com.konka.iot.kilink.cloud.support.api.model.device.DeviceModel;
-import com.konka.iot.kilink.cloud.support.api.model.device.DeviceStatusModel;
+import com.konka.iot.kilink.cloud.support.api.model.device.*;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -84,4 +81,22 @@ public interface DeviceService {
      * @throws Exception
      */
     boolean bindByQrcode(String userId, String productId, String deviceId, String accessToken) throws Exception;
+
+    /**
+     * 取消订阅设备
+     * @param userId
+     * @param deviceId
+     * @return
+     * @throws Exception
+     */
+    boolean unbindDevice(String userId, String deviceId) throws Exception;
+
+    /**
+     * 获取设备下的用户信息列表
+     * @param productId
+     * @param deviceId
+     * @return
+     * @throws Exception
+     */
+    List<DeviceUsersModel> getDeviceUsers(String productId, String deviceId) throws Exception;
 }

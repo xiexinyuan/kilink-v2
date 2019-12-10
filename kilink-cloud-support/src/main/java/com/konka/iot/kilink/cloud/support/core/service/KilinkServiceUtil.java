@@ -7,6 +7,7 @@ import com.konka.iot.baseframe.common.utils.JsonUtil;
 import com.konka.iot.baseframe.common.utils.RedisUtil;
 import com.konka.iot.kilink.cloud.support.api.model.device.DeviceModel;
 import com.konka.iot.kilink.cloud.support.api.model.device.DeviceStatusModel;
+import com.konka.iot.kilink.cloud.support.api.model.device.DeviceUsersModel;
 import com.konka.iot.kilink.cloud.support.api.model.product.ProductDatapoint;
 import com.konka.iot.kilink.cloud.support.config.KilinkConfig;
 import com.konka.iot.kilink.cloud.support.enums.KilinkApiEnum;
@@ -90,7 +91,7 @@ public class KilinkServiceUtil {
      */
     public List<ProductDatapoint> getProductDatapoint(String productId) throws Exception {
         List<ProductDatapoint> productDatapoints = null;
-        String datapoints = (String)redisUtil.get(kilinkConfig.getKilink_product_datapoint().concat(productId));
+        String datapoints = JsonUtil.obj2String(redisUtil.get(kilinkConfig.getKilink_product_datapoint().concat(productId)));
         if(datapoints != null){
             productDatapoints = JsonUtil.string2Obj(datapoints, new TypeReference<List<ProductDatapoint>>() {});
         }else{
@@ -161,15 +162,7 @@ public class KilinkServiceUtil {
      */
     public boolean bindByQrcode(String userId, String productId, String deviceId, String accessToken) throws Exception{
         //不存在二维码绑定必要端点则加入端点
-        String datapoints = (String)redisUtil.get(kilinkConfig.getKilink_product_datapoint().concat(productId));
-        List<ProductDatapoint> productDatapoints = null;
-
-        if(datapoints != null){
-            productDatapoints = JsonUtil.string2Obj(datapoints, new TypeReference<List<ProductDatapoint>>() {});
-        }else{
-            productDatapoints = getProductDatapoint(productId);
-            redisUtil.set(kilinkConfig.getKilink_product_datapoint().concat(productId), JsonUtil.obj2String(productDatapoints));
-        }
+        List<ProductDatapoint> productDatapoints = getProductDatapoint(productId);
         boolean exist = productDatapoints.stream().anyMatch(ProductDatapoint->ProductDatapoint.getName().equals("$1002"));
         if(!exist){
             addProductDatapoint(productId, "$1002", 1, 255);
@@ -316,6 +309,45 @@ public class KilinkServiceUtil {
         return null;
     }
 
+    /**
+     * 获取设备下的用户信息列表
+     * @param productId
+     * @param deviceId
+     * @return
+     * @throws Exception
+     */
+    public List<DeviceUsersModel> getDeviceUsers(String productId, String deviceId) throws Exception {
+        String url = kilinkConfig.getCloud_url() + KilinkApiEnum.DEVICE_USER_LIST_URL.getUrl().replace("{product_id}", productId).replace("{device_id}", deviceId);
+        HttpResult result = httpUtil.doGet(url, null, kilinkApiUtil.createHeaderMap());
+        if(result.getCode() == 200){
+            logger.info("获取设备下的用户信息列表：{}", result.getBody());
+            Map<String,Object> resultMap = JsonUtil.string2Obj(result.getBody(), new TypeReference<Map<String,Object>>(){});
+            return JsonUtil.string2Obj(JsonUtil.obj2String(resultMap.get("list")), new TypeReference<List<DeviceUsersModel>>() {});
+        }else{
+            errorMsg(result.getBody(), "获取设备下的用户信息列表失败");
+        }
+        return null;
+    }
+
+    /**
+     * 取消订阅设备
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    public boolean unbindDevice(String userId, String deviceId) throws Exception {
+        String url = kilinkConfig.getCloud_url() + KilinkApiEnum.USER_UNBIND_DEVICE.getUrl().replace("{user_id}", userId);
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("device_id",deviceId);
+        HttpResult result = httpUtil.doPost(url, params, kilinkApiUtil.createHeaderMap());
+        if(result.getCode() == 200){
+            logger.info("取消订阅设备成功：{}", result.getBody());
+            return true;
+        }else{
+            errorMsg(result.getBody(), "取消订阅设备失败");
+        }
+        return false;
+    }
     private void errorMsg(String resultBody, String message) throws DataCheckException{
         resultBody = resultBody.replace("\'","");
         Map<String,Object> resultMap = JsonUtil.string2Obj(resultBody, new TypeReference<Map<String,Object>>(){});

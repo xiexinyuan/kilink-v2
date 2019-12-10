@@ -4,10 +4,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.konka.iot.baseframe.common.core.service.BaseService;
 import com.konka.iot.baseframe.common.utils.JsonUtil;
 import com.konka.iot.baseframe.common.utils.RedisUtil;
-import com.konka.iot.kilink.cloud.support.api.model.device.DataponitMapping;
-import com.konka.iot.kilink.cloud.support.api.model.device.DeviceMapping;
-import com.konka.iot.kilink.cloud.support.api.model.device.DeviceModel;
-import com.konka.iot.kilink.cloud.support.api.model.device.DeviceStatusModel;
+import com.konka.iot.kilink.cloud.support.api.model.device.*;
 import com.konka.iot.kilink.cloud.support.api.service.device.DeviceService;
 import com.konka.iot.kilink.cloud.support.config.Redis.TuyaRediskeyConfig;
 import com.konka.iot.kilink.cloud.support.config.dataSource.DataSourceKey;
@@ -77,7 +74,8 @@ public class DeviceServiceImpl extends BaseService implements DeviceService {
         // 移除null元素
         deviceMappingsRedis.removeAll(Collections.singleton(null));
 
-        if(deviceMappingsRedis != null && !deviceMappingsRedis.isEmpty()){
+        if(deviceMappingsRedis != null && !deviceMappingsRedis.isEmpty()
+                && deviceMappingsRedis.size() == tDeviceIds.size()){
             for (Object object: deviceMappingsRedis) {
                 deviceMappings.add(JsonUtil.string2Obj(object.toString(), DeviceMapping.class));
             }
@@ -116,7 +114,7 @@ public class DeviceServiceImpl extends BaseService implements DeviceService {
         List<DataponitMapping> dataponitMappings = null;
         String dataponitMappingRedis = (String) redisUtil.get(tuyaRediskeyConfig.getDatapoint_mapping_prefix().concat(tPid));
 
-        if(dataponitMappingRedis != null){
+        if(dataponitMappingRedis != null && !"".equals(dataponitMappingRedis)){
             dataponitMappings = JsonUtil.string2Obj(dataponitMappingRedis, new TypeReference<List<DataponitMapping>>() {});
         }else {
             dataponitMappings = deviceDao.findThridDatapointMapping(tPid);
@@ -129,5 +127,15 @@ public class DeviceServiceImpl extends BaseService implements DeviceService {
     public boolean bindByQrcode(String userId, String productId, String deviceId, String accessToken) throws Exception {
 
         return kilinkServiceUtil.bindByQrcode(userId, productId, deviceId, accessToken);
+    }
+
+    @Override
+    public List<DeviceUsersModel> getDeviceUsers(String productId, String deviceId) throws Exception {
+        return kilinkServiceUtil.getDeviceUsers(productId, deviceId);
+    }
+
+    @Override
+    public boolean unbindDevice(String userId, String deviceId) throws Exception {
+        return kilinkServiceUtil.unbindDevice(userId, deviceId);
     }
 }

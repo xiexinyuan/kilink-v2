@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 public class DeviceStatusReportModel implements Serializable {
     // 设备ID
-    private String deviceId;
+    private String devId;
     // 开发者平台定义产品对应的产品key
     private String productKey;
     // 数据ID
@@ -25,7 +25,7 @@ public class DeviceStatusReportModel implements Serializable {
     @Override
     public String toString( ) {
         return "DeviceStatusReportModel{" +
-                "deviceId='" + deviceId + '\'' +
+                "devId='" + devId + '\'' +
                 ", productKey='" + productKey + '\'' +
                 ", dataId='" + dataId + '\'' +
                 ", status=" + status +

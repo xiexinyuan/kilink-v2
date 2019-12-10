@@ -17,7 +17,9 @@ public enum  TuyaApiEnum {
     DEL_DEVICE("/v1.0/devices/{device_id}","移除设备"),
     EDIT_SUB_DEVICE("/v1.0/devices/{device_id}/functions/{function_code}","修改子设备名称"),
     REST_DEVICE("/v1.0/devices/{device_id}/reset-factory","恢复设备出厂设置"),
-    GET_SCENES("/v1.0/homes/{home_id}/scenes","查询家庭下的场景列表");
+    GET_SCENES("/v1.0/homes/{home_id}/scenes","查询家庭下的场景列表"),
+    DEVICE_ALL_STATISTIC("/v1.0/devices/{device_id}/all-statistic-type","获取设备支持的统计类型"),
+    DEVICE_STATISTIC_ACCUMULATE("/v1.0/devices/{device_id}/all-statistic-accumulate","获取历史累计值");
 
     //接口地址
     private String url;

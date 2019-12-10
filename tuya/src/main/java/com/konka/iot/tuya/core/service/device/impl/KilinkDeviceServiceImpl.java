@@ -86,6 +86,7 @@ public class KilinkDeviceServiceImpl extends BaseService implements KilinkDevice
 
     @Override
     public DeviceActiveResultModel getResultModel() throws Exception{
+        logger.info("==================获取阻塞队列中的值==================");
         return resultModelsQueue.take();
     }
     @Override
@@ -102,9 +103,7 @@ public class KilinkDeviceServiceImpl extends BaseService implements KilinkDevice
         resultModel.setMessage(message);
         resultModel.setIsActive(isActive);
         try {
-            synchronized (this){
-                resultModelsQueue.put(resultModel);
-            }
+            resultModelsQueue.put(resultModel);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,7 +129,7 @@ public class KilinkDeviceServiceImpl extends BaseService implements KilinkDevice
         throw new DataCheckException(ErrorCodeEnum.ERROR.getCode(), "产品" + msg.toString() + "映射配置为空");
     }
 
-    // 当个设备
+    // 单个设备
     private void dealActiveDevice(String g_deviceId, DeviceAddModel deviceAddModel, ProductMapping productMapping) throws Exception {
         // 已经激活的设备, 只需要上线并且绑定与当前用户的关系即可 无需重新激活
         //1、获取设备映射关系
@@ -151,7 +150,7 @@ public class KilinkDeviceServiceImpl extends BaseService implements KilinkDevice
                         saveActiveRecord(deviceMapping.getKDeviceId(), ErrorCodeEnum.SUCCESS.getCode(), "绑定成功", true);
                     } catch (DataCheckException e) {
                         logger.error(e.getMessage());
-                        saveActiveRecord(deviceMapping.getKDeviceId(), ErrorCodeEnum.DEVICE_BIND_USER_ERROR.getCode(), ErrorCodeEnum.DEVICE_BIND_USER_ERROR.getMessage(), false);
+                        saveActiveRecord(deviceMapping.getKDeviceId(), ErrorCodeEnum.DEVICE_BIND_USER_ERROR.getCode(), e.getMessage(), false);
                         e.printStackTrace();
                     } catch (Exception e) {
                         logger.error("设备绑定异常： {}", e.getMessage());

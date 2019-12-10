@@ -4,10 +4,14 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.konka.iot.baseframe.common.config.ErrorCodeEnum;
 import com.konka.iot.baseframe.common.exception.DataCheckException;
 import com.konka.iot.baseframe.common.model.ResponseModel;
+import com.konka.iot.kilink.cloud.support.api.service.device.DeviceService;
 import com.konka.iot.kilink.cloud.support.api.service.product.ProductService;
 import com.konka.iot.tuya.core.service.device.KilinkDeviceService;
+import com.konka.iot.tuya.core.service.device.TuyaDeviceService;
 import com.konka.iot.tuya.model.device.DeviceActiveResultModel;
 import com.konka.iot.tuya.model.device.DeviceAddModel;
+import com.konka.iot.tuya.model.device.StatisticAccumulate;
+import com.konka.iot.tuya.model.device.StatisticType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +41,11 @@ public class KilinkDeviceController {
     @Autowired
     private KilinkDeviceService kilinkDeviceService;
 
+    @Autowired
+    private TuyaDeviceService tuyaDeviceService;
+
+    @Reference
+    private DeviceService deviceService;
     @Reference
     private ProductService productService;
 
@@ -79,6 +89,44 @@ public class KilinkDeviceController {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("获取产品{}对应的涂鸦产品ID异常: {}", p_id, e.getMessage());
+            resp = new ResponseModel<>(500, false, e.getMessage());
+        }
+        return resp;
+    }
+
+
+
+    @GetMapping(value = {"/{deviceId}/statistic-type"})
+    @ApiOperation(value = "获取设备支持的统计类型", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseModel<List<StatisticType>> getStatisticType(@PathVariable("deviceId")
+                                                               @ApiParam(name = "deviceId", value = "设备ID", required = true) String deviceId) {
+        ResponseModel<List<StatisticType>> resp = null;
+        try {
+            String t_id = deviceService.findTuyaDeviceId(deviceId);
+            List<StatisticType> result = tuyaDeviceService.getAllStatisticType(t_id);
+            resp = new ResponseModel<>(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取设备支持的统计类型{}失败: {}", deviceId, e.getMessage());
+            resp = new ResponseModel<>(500, false, e.getMessage());
+        }
+        return resp;
+    }
+
+    @GetMapping(value = "/{deviceId}/statistic-accumulate/{code}")
+    @ApiOperation(value = "获取历史累计值", httpMethod = "GET", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseModel<StatisticAccumulate> getStatisticAccumulate(@PathVariable("deviceId")
+                                                                     @ApiParam(name = "deviceId", value = "设备ID", required = true) String deviceId,
+                                                                     @PathVariable(value = "code")
+                                                                     @ApiParam(name = "code", value = "设备端点code", required = true) String code) {
+        ResponseModel<StatisticAccumulate> resp = null;
+        try {
+            String t_id = deviceService.findTuyaDeviceId(deviceId);
+            StatisticAccumulate result = tuyaDeviceService.getStatisticAccumulate(t_id, code);
+            resp = new ResponseModel<>(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取历史累计值{}失败: {}", deviceId, e.getMessage());
             resp = new ResponseModel<>(500, false, e.getMessage());
         }
         return resp;

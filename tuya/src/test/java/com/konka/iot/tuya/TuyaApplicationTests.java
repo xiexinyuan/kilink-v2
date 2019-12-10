@@ -2,6 +2,8 @@ package com.konka.iot.tuya;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.konka.iot.tuya.config.TuyaConfig;
+import com.konka.iot.tuya.core.service.message.MessageService;
+import com.konka.iot.tuya.model.message.ReceiveDataModel;
 import com.tuya.api.TuyaClient;
 import com.tuya.api.model.enums.UserTypeEnum;
 import com.tuya.api.util.MD5Util;
@@ -20,6 +22,8 @@ public class TuyaApplicationTests {
     private TuyaClient tuyaClient;
     @Autowired
     private TuyaConfig tuyaConfig;
+    @Autowired
+    private MessageService messageService;
 
     @Test
     public void contextLoads() {
@@ -44,5 +48,14 @@ public class TuyaApplicationTests {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testDelMessage(){
+        ReceiveDataModel model = new ReceiveDataModel();
+        model.setProtocol(4);
+        String data = "NdCFxg8nj/1LIUv350ELTmA5PInnVyecK1r7gBWDAU1qt41DZDJTMWu/019UNxYx6z9hSROZiuMpCRwWuRYlwbHqUk3S6YhHSAFNhAt+gVCYMrWfxc0SJAAOuwD9lWb4m7DNleO0ASsDkudZAnXPRf5LzwlhKC2njoKCHjNxwbI2EjpfGjRoeZri4tYc+PLYo9BPQ7Iy4J6IXbeZSrxg3HW++H5vxzQgzdL+0hwzjpJyftEOgGC84lgF6JiGik73";
+        model.setData(data);
+        messageService.dealMessage(model);
     }
 }

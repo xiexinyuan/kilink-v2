@@ -1,12 +1,14 @@
 package com.konka.iot.baseframe.mqtt.utils;
 
 import com.konka.iot.baseframe.common.utils.ByteUtil;
+import com.konka.iot.baseframe.common.utils.JsonUtil;
 import com.konka.iot.baseframe.mqtt.model.VgCommand;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import sun.misc.BASE64Encoder;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

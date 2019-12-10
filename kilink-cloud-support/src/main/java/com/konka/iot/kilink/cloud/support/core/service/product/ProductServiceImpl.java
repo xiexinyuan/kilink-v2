@@ -21,7 +21,7 @@ import java.util.*;
  * @Description TODO
  */
 
-@Service
+@Service(version = "1.0", group = "test")
 public class ProductServiceImpl extends BaseService implements ProductService {
 
     @Autowired

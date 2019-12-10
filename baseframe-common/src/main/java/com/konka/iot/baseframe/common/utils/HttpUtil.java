@@ -18,6 +18,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -135,8 +136,33 @@ public class HttpUtil {
         CloseableHttpResponse response = this.httpClient.execute(httpPost);
         return new HttpResult(response.getStatusLine().getStatusCode(), EntityUtils.toString(
                 response.getEntity(), "UTF-8"));
-    }    
-    
+    }
+
+    /**
+     * 带参数的post请求
+     *
+     * @param url
+     * @param json
+     * @return
+     * @throws Exception
+     */
+    public HttpResult doPost(String url, String json) throws Exception {
+        // 声明httpPost请求
+        HttpPost httpPost = new HttpPost(url);
+        // 加入配置信息
+        httpPost.setConfig(config);
+
+        // 判断map是否为空，不为空则转换为json字符串
+        if (json != null) {
+            httpPost.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+        }
+
+        // 发起请求
+        CloseableHttpResponse response = this.httpClient.execute(httpPost);
+        return new HttpResult(response.getStatusLine().getStatusCode(), EntityUtils.toString(
+                response.getEntity(), "UTF-8"));
+    }
+
     /**
      * 带参数并需要设置请求头的post请求
      *
@@ -200,17 +226,6 @@ public class HttpUtil {
         return new HttpResult(response.getStatusLine().getStatusCode(), EntityUtils.toString(
                 response.getEntity(), "UTF-8"));
     }
-    /**
-     * 不带参数post请求
-     *
-     * @param url
-     * @return
-     * @throws Exception
-     */
-    public HttpResult doPost(String url) throws Exception {
-        return this.doPost(url, null);
-    }
-
 
     /**
      * 带参数的put请求

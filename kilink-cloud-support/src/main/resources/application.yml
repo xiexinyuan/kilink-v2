@@ -1,7 +1,7 @@
 spring:
   profiles:
     # 环境 dev|test|pro
-    active: dev
+    active: test
 
 #缓存key配置
 redis-prefix:

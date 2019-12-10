@@ -18,7 +18,8 @@ public enum KilinkApiEnum {
     SET_DEVICE_DATAPOINT("/v2/device/command/{device_id}/datapoint",RequestMethod.POST,"用于通过操作虚拟设备来回写操作设备"),
     DEVICE_QRCODE("/v2/product/{product_id}/device/{device_id}/qrcode",RequestMethod.POST,"生成设备二维码"),
     USER_BIND_DEVICE_QRCODE("/v2/user/{user_id}/qrcode_subscribe",RequestMethod.POST,"用户通过二维码绑定设备"),
-    SET_DEVICE_DATAPOINT_URL("/v2/device/command/{device_id}/datapoint",RequestMethod.POST,"用户通过二维码绑定设备"),
+    USER_UNBIND_DEVICE("/v2/user/{user_id}/unsubscribe",RequestMethod.POST,"取消订阅设备"),
+    DEVICE_USER_LIST_URL("/v2/product/{product_id}/device/{device_id}/subscribes",RequestMethod.POST,"查询设备下的用户信息"),
     ADD_DEVICE_BATCH("/v2/product/{product_id}/device_import_batch_2",RequestMethod.POST,"批量添加设备");
 
     // 接口地址

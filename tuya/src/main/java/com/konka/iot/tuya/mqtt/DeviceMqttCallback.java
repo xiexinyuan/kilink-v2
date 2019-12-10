@@ -1,8 +1,10 @@
 package com.konka.iot.tuya.mqtt;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSONObject;
 import com.konka.iot.baseframe.common.config.ErrorCodeEnum;
 import com.konka.iot.baseframe.common.utils.ByteUtil;
+import com.konka.iot.baseframe.common.utils.JsonUtil;
 import com.konka.iot.baseframe.common.utils.RedisUtil;
 import com.konka.iot.baseframe.mqtt.client.MqttClientService;
 import com.konka.iot.baseframe.mqtt.config.XlinkMqttConstant.Topic;
@@ -104,13 +106,23 @@ public class DeviceMqttCallback extends MqttListener {
             //设备上线应答 回调
             onlineResult(topic, message.getPayload());
         } else if (topic.startsWith(Topic.DEVICE_CONTROL.getCode(""))) {
+
+            byte[]  messageIdByte = Arrays.copyOfRange(message.getPayload(), 4, 6);
+            int messageId = ByteUtil.byteToInt(messageIdByte);
+            log.info("=======================messageId========================");
+            log.info("messageId is : {}", messageId);
+            log.info("=======================messageId========================");
             //应用设置数据端点 topic : s7/123456
             String deviceId = topic.substring(3);
             List<VgCommand> vgCommands = CommandUtil.parseDatapoint(message.getPayload());
             // 添加控制涂鸦的方法 1、设备id查到涂鸦设备id,平台产品id->数据端点映射关系—>涂鸦端点
             commandDevice(deviceId, vgCommands);
             // $8是为了请求不超时
-            deviceMqttClientService.publishMessage(Topic.DEVICE_CONTROL_RESPONSE.getCode(deviceId), XlinkMqttMsgUtil.getStatusRebackResponse(), 1);
+            MqttMessage msg = new MqttMessage();
+            msg.setId(messageId);
+            msg.setQos(0);
+            msg.setPayload(XlinkMqttMsgUtil.getStatusRebackResponse(messageId));
+            deviceMqttClientService.publishMessage(Topic.DEVICE_CONTROL_RESPONSE.getCode(deviceId), msg);
         }
     }
 
@@ -381,19 +393,20 @@ public class DeviceMqttCallback extends MqttListener {
         DeviceAddModel deviceAddModel = (DeviceAddModel) params.get("deviceAddModel");
         // 获取涂鸦设备的当前状态
         List<Status> statuses = tuyaDeviceService.getDeviceStatus(deviceAddModel.getDeviceId());
+        log.info("获取到的设备{}状态为：{}", deviceId, JsonUtil.obj2String(statuses));
         List<DataponitMapping> dataponitMappings = deviceService.findThridDatapointMapping(productMapping.getTProductId());
-        List<VgCommand> vgCommands = new ArrayList<>(statuses.size());
+        List<VgCommand> vgCommands = new ArrayList<>();
         for (Status status: statuses) {
-            VgCommand vgCommand = new VgCommand();
             for (DataponitMapping dataponitMapping: dataponitMappings) {
                 if(status.getCode().equals(dataponitMapping.getTDatapointCode())){
+                    VgCommand vgCommand = new VgCommand();
                     vgCommand.setIndex(dataponitMapping.getKDatapointIndex());
                     vgCommand.setType(dataponitMapping.getKDatapointType());
                     vgCommand.setValue(status.getValue());
+                    vgCommands.add(vgCommand);
                     break;
                 }
             }
-            vgCommands.add(vgCommand);
         }
         // 上报设备当前状态
         deviceMqttClientService.reportDeviceStatus(deviceId, vgCommands);
@@ -406,8 +419,7 @@ public class DeviceMqttCallback extends MqttListener {
      * @param commands 控制指令
      */
     private void commandDevice(String deviceId, List<VgCommand> commands){
-        log.info("控制消息为：{}", commands);
-
+        log.info("下发控制消息为：{}", commands);
         try {
             //1、获取涂鸦设备ID
             String tDeviceId = deviceService.findTuyaDeviceId(deviceId);
@@ -427,6 +439,7 @@ public class DeviceMqttCallback extends MqttListener {
                     }
                 }
             }
+            log.info("下发至涂鸦控制消息为：{}", JSONObject.toJSONString(tuyaCommands));
             //4、控制涂鸦设备
             boolean success = tuyaDeviceService.deviceCommand(tDeviceId, tuyaCommands);
             if (success){
@@ -468,7 +481,11 @@ public class DeviceMqttCallback extends MqttListener {
                     object = Float.parseFloat(value);
                     break;
                 case 6:
-                    object = value;
+                    try {
+                        object = JSONObject.parseObject(value);
+                    } catch (Exception e) {
+                        object = value;
+                    }
                     break;
                 case 7:
                     Decoder decoder = Base64.getDecoder();
